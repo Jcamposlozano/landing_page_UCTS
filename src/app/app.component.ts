@@ -10,6 +10,7 @@ import { MythsComponent } from './myths/myths.component';
 import { RisksComponent } from './risks/risks.component';
 import { ConclusionComponent } from './conclusion/conclusion.component';
 import { WorkshopComponent } from './workshop/workshop.component';
+import { NotebookConceptsComponent } from './notebook-concepts/notebook-concepts.component';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +27,7 @@ import { WorkshopComponent } from './workshop/workshop.component';
     RisksComponent,
     ConclusionComponent,
     WorkshopComponent,
+    NotebookConceptsComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
@@ -41,6 +43,7 @@ export class AppComponent {
     { label: 'Mitos', href: '#myths' },
     { label: 'Riesgos', href: '#risks' },
     { label: 'Cierre', href: '#conclusion' },
+    { label: 'Guía del taller', href: '#notebook-concepts' },
     { label: 'Taller práctico', href: '#taller-practico' },
   ];
 }

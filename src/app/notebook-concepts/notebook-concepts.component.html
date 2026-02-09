@@ -1,0 +1,304 @@
+<section id="notebook-concepts" class="py-20 px-6 bg-slate-50">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-3xl md:text-4xl font-bold text-brand-900 mb-4">Guía conceptual del taller: Detección de COVID-19 en radiografías</h2>
+    <p class="text-lg text-slate-600 mb-12">
+      Esta guía explica, paso a paso y sin asumir conocimiento técnico, todo lo que hace el notebook. Pensada para médicos que quieren entender el proceso completo.
+    </p>
+
+    <div class="space-y-16">
+      <!-- INTRODUCCIÓN -->
+      <article class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+        <h3 class="text-2xl font-bold text-brand-800 mb-6">¿Qué hace este proyecto?</h3>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          El taller implementa un sistema que, dado una radiografía de tórax, intenta clasificarla en una de dos categorías: <strong>COVID-19</strong> o <strong>Normal</strong>. Es una clasificación binaria (como positivo/negativo) basada en patrones visuales que la red neuronal aprende de muchas imágenes ya etiquetadas.
+        </p>
+        <p class="text-slate-700 leading-relaxed">
+          <strong>Importante:</strong> Este es un ejercicio educativo. En la práctica clínica real, ningún modelo de IA sustituye el criterio del radiólogo ni el diagnóstico clínico integrado.
+        </p>
+      </article>
+
+      <!-- ¿POR QUÉ CNN? -->
+      <article class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+        <h3 class="text-2xl font-bold text-brand-800 mb-6">¿Por qué usamos CNN y no otro tipo de red?</h3>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          Las <strong>redes neuronales convolucionales (CNN)</strong> están diseñadas para trabajar con <strong>imágenes</strong>. Capturan patrones espaciales: bordes, texturas, formas, zonas concretas de la imagen. Es como si la red «mirara» trozos pequeños de la imagen y fuera ensamblando la información.
+        </p>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          Las <strong>RNN</strong> (redes recurrentes) están pensadas para datos <strong>secuenciales</strong>: texto, series temporales, señales que van en el tiempo. Una radiografía no es una secuencia; es una imagen con estructura espacial. Por eso, para clasificación de imágenes médicas, las CNN son el estándar.
+        </p>
+        <div class="bg-brand-50 p-4 rounded-lg border border-brand-200">
+          <p class="text-brand-800 font-semibold">En resumen:</p>
+          <p class="text-slate-700 mt-1">CNN = datos espaciales (imágenes). RNN = datos secuenciales (texto, tiempo). Para radiografías, usamos CNN.</p>
+        </div>
+      </article>
+
+      <!-- PASO 1: LIBRERÍAS -->
+      <article class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+        <h3 class="text-2xl font-bold text-brand-800 mb-6">Paso 1: Librerías y herramientas</h3>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          Las <strong>librerías</strong> son conjuntos de código ya escrito que alguien más programó para tareas comunes. En lugar de programar todo desde cero, usamos estas herramientas ya hechas.
+        </p>
+        <ul class="space-y-3 text-slate-700 mb-4">
+          <li><strong>TensorFlow / Keras:</strong> Framework para construir y entrenar redes neuronales. Es donde se define el modelo CNN.</li>
+          <li><strong>NumPy:</strong> Operaciones matemáticas con arrays (listas de números). Las imágenes se representan como matrices de números.</li>
+          <li><strong>Pandas:</strong> Manejo de tablas de datos (como Excel). Sirve para organizar rutas de imágenes y etiquetas.</li>
+          <li><strong>Matplotlib / Seaborn:</strong> Crear gráficas para visualizar datos y resultados.</li>
+          <li><strong>PIL (Pillow):</strong> Cargar y manipular imágenes.</li>
+          <li><strong>Scikit-learn:</strong> Métricas de evaluación (precisión, sensibilidad, matriz de confusión).</li>
+        </ul>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          Ninguna de estas librerías «piensa» por sí sola. Son herramientas que el programador usa para construir el flujo completo.
+        </p>
+        <p class="text-slate-700 leading-relaxed">
+          <strong>¿Qué es una imagen para la computadora?</strong> Una imagen digital es una matriz de números. Cada píxel tiene un valor (o varios si es color). En escala de grises, 0 = negro, 255 = blanco. La red procesa solo números; no «ve» la imagen como nosotros.
+        </p>
+      </article>
+
+      <!-- PASO 2: DATASET -->
+      <article class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+        <h3 class="text-2xl font-bold text-brand-800 mb-6">Paso 2: Estructura del dataset</h3>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          El <strong>dataset</strong> es el conjunto de datos con el que entrenamos y evaluamos el modelo. En este proyecto:
+        </p>
+        <ul class="space-y-2 text-slate-700 mb-4">
+          <li><strong>train/covid19:</strong> Radiografías de pacientes con COVID-19 (para entrenar).</li>
+          <li><strong>train/normal:</strong> Radiografías de pacientes sanos (para entrenar).</li>
+          <li><strong>test/covid19:</strong> Radiografías con COVID-19 (para probar, no vistas durante el entrenamiento).</li>
+          <li><strong>test/normal:</strong> Radiografías normales (para probar).</li>
+        </ul>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          El proyecto usa aproximadamente <strong>176 imágenes por clase en entrenamiento</strong> y <strong>44 por clase en prueba</strong>. Es un dataset pequeño; en investigación real suelen usarse miles o decenas de miles.
+        </p>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          Un <strong>DataFrame</strong> es una tabla: cada fila es una imagen, con columnas como «ruta del archivo», «etiqueta» (covid19 o normal) y «conjunto» (train o test). Sirve para organizar y filtrar los datos fácilmente.
+        </p>
+        <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
+          <p class="text-amber-800 font-semibold">Criterio médico:</p>
+          <p class="text-slate-700 mt-1">La calidad y representatividad del dataset son fundamentales. Imágenes mal etiquetadas o poco representativas generan modelos sesgados o poco fiables.</p>
+        </div>
+      </article>
+
+      <!-- PASO 3: EDA -->
+      <article class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+        <h3 class="text-2xl font-bold text-brand-800 mb-6">Paso 3: Análisis exploratorio (EDA)</h3>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          El <strong>análisis exploratorio</strong> consiste en revisar los datos antes de entrenar: distribución de clases, ejemplos de imágenes, tamaños, etc.
+        </p>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          <strong>Gráfica 1 — Distribución de clases:</strong> Cuántas imágenes hay de cada clase en train y test. Es importante que estén equilibradas (balanceadas). Si hubiera muchas más de una clase que de otra, el modelo podría inclinarse hacia la clase mayoritaria.
+        </p>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          <strong>Gráfica 2 — Muestra de imágenes:</strong> Se muestran ejemplos de radiografías de cada clase. Permite ver qué tipo de imágenes estamos clasificando y detectar posibles errores de etiquetado.
+        </p>
+        <p class="text-slate-700 leading-relaxed">
+          <strong>Gráfica 3 — Dimensiones:</strong> Las imágenes pueden tener distintos tamaños (píxeles de ancho y alto). Las CNN necesitan un tamaño fijo de entrada. Esta gráfica ayuda a decidir a qué tamaño redimensionar todas las imágenes.
+        </p>
+      </article>
+
+      <!-- PASO 4: PREPROCESAMIENTO -->
+      <article class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+        <h3 class="text-2xl font-bold text-brand-800 mb-6">Paso 4: Preprocesamiento</h3>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          El <strong>preprocesamiento</strong> prepara las imágenes para que el modelo pueda procesarlas correctamente.
+        </p>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          <strong>1. Redimensionado (resize):</strong> Todas las imágenes se ajustan a <strong>224×224 píxeles</strong>. Es un tamaño estándar para muchas redes convolucionales. Si una imagen es más grande o más pequeña, se adapta (puede deformarse ligeramente).
+        </p>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          <strong>2. Normalización:</strong> Los píxeles vienen en valores de 0 a 255. Se escalan a 0–1 dividiendo por 255. Esto mejora la estabilidad del entrenamiento (el optimizador trabaja mejor con números en ese rango).
+        </p>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          <strong>3. Data augmentation (solo en entrenamiento):</strong> Se crean variaciones artificiales de las imágenes: rotaciones, giros horizontales, zooms, desplazamientos. La idea es “simular” más casos sin tener más radiografías reales, para que el modelo generalice mejor y no memorice imágenes concretas.
+        </p>
+        <div class="bg-brand-50 p-4 rounded-lg border border-brand-200">
+          <p class="text-brand-800 font-semibold">Analogía:</p>
+          <p class="text-slate-700 mt-1">Data augmentation es como estudiar con el libro en diferentes posiciones y con distinta iluminación: te prepara para situaciones variadas, no solo para una foto concreta.</p>
+        </div>
+      </article>
+
+      <!-- PASO 5: MODELO CNN -->
+      <article class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+        <h3 class="text-2xl font-bold text-brand-800 mb-6">Paso 5: Arquitectura del modelo CNN</h3>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          La red tiene varias capas que procesan la imagen de forma secuencial. Cada concepto en lenguaje sencillo:
+        </p>
+        <ul class="space-y-4 text-slate-700 mb-4">
+          <li>
+            <strong>Capas convolucionales (Conv2D):</strong> Son «filtros» que buscan patrones pequeños: bordes, texturas, formas. Cada filtro detecta algo distinto. Hay 4 bloques con 32, 64, 128 y 256 filtros, aumentando la complejidad de lo que se detecta.
+          </li>
+          <li>
+            <strong>MaxPooling:</strong> Reduce el tamaño espacial de la imagen manteniendo la información más relevante. Toma ventanas y conserva el valor máximo. Reduce dimensiones y el coste computacional.
+          </li>
+          <li>
+            <strong>BatchNormalization:</strong> Normaliza los valores entre capas para que el entrenamiento sea más estable. Evita que algunas activaciones dominen y desestabilicen el proceso.
+          </li>
+          <li>
+            <strong>Dropout:</strong> Durante el entrenamiento, «apaga» aleatoriamente un porcentaje de neuronas (25% o 50%). Evita que el modelo dependa demasiado de pocas neuronas y reduce el sobreajuste (overfitting).
+          </li>
+          <li>
+            <strong>Flatten:</strong> Convierte la salida 2D (mapa de características) en un vector 1D para poder pasarlo a capas densas.
+          </li>
+          <li>
+            <strong>Capas Dense:</strong> Capas totalmente conectadas que combinan toda la información para la decisión final. La última capa tiene 1 neurona con activación sigmoide: produce un valor entre 0 y 1 (probabilidad de COVID-19).
+          </li>
+        </ul>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          El modelo tiene ~6.8 millones de parámetros. Cada parámetro es un número que la red ajusta durante el entrenamiento para minimizar el error.
+        </p>
+        <p class="text-slate-700 leading-relaxed">
+          <strong>Overfitting (sobreajuste):</strong> Ocurre cuando el modelo «memoriza» los ejemplos de entrenamiento en lugar de capturar patrones generalizables. Funciona muy bien con los datos que vio, pero falla con datos nuevos. El Dropout, la validación y el EarlyStopping ayudan a reducir este problema.
+        </p>
+      </article>
+
+      <!-- PASO 6: ENTRENAMIENTO -->
+      <article class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+        <h3 class="text-2xl font-bold text-brand-800 mb-6">Paso 6: Entrenamiento</h3>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          El <strong>entrenamiento</strong> es el proceso en el que el modelo ajusta sus parámetros para reducir el error entre las predicciones y las etiquetas reales.
+        </p>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          <strong>Optimizador Adam:</strong> Define cómo se actualizan los parámetros para minimizar la pérdida (error). El learning rate (1e-3) controla el tamaño de cada paso. Demasiado alto puede inestabilizar; demasiado bajo puede ralentizar demasiado.
+        </p>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          <strong>Función de pérdida (binary_crossentropy):</strong> Mide cuánto se equivoca el modelo en clasificación binaria. El objetivo es minimizarla.
+        </p>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          <strong>EarlyStopping:</strong> Si la pérdida en validación deja de mejorar durante varias épocas (por ejemplo 10), se detiene el entrenamiento y se restauran los pesos del mejor momento. Evita entrenar de más y caer en overfitting.
+        </p>
+        <p class="text-slate-700 leading-relaxed">
+          <strong>ReduceLROnPlateau:</strong> Si la validación se estanca, reduce el learning rate a la mitad. Permite afinar los parámetros con pasos más pequeños.
+        </p>
+      </article>
+
+      <!-- PASO 7: EVALUACIÓN -->
+      <article class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+        <h3 class="text-2xl font-bold text-brand-800 mb-6">Paso 7: Evaluación y gráficas</h3>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          Tras el entrenamiento, se evalúa el modelo con el conjunto de <strong>test</strong> (imágenes que no vio durante el entrenamiento).
+        </p>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          <strong>Gráficas de entrenamiento:</strong> Curvas de pérdida y accuracy en train vs validación. Si la pérdida de validación sube mientras la de entrenamiento baja, hay overfitting (el modelo memoriza el train y no generaliza bien).
+        </p>
+        <div class="my-8">
+          <img src="assets/images/Entrenamiento.png" alt="Evolución del entrenamiento: pérdida y accuracy" class="w-full max-w-2xl mx-auto rounded-xl shadow-lg border border-slate-200">
+          <div class="mt-4 p-4 bg-slate-50 rounded-lg text-sm text-slate-700">
+            <p class="font-semibold mb-2">Resumen de la evolución:</p>
+            <ul class="space-y-1">
+              <li><strong>Loss (pérdida):</strong> Train inicia ~0.5 y termina ~0.1; Val inicia ~0.25 y termina ~0.17. Ambas descienden, indicando que el modelo aprende.</li>
+              <li><strong>Accuracy (exactitud):</strong> Train inicia ~0 y termina ~0.95; Val inicia ~0.9 y termina ~0.93. La validación se mantiene estable, lo que sugiere buena generalización.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          <strong>Matriz de confusión:</strong> Muestra cuántos casos se clasificaron correctamente y cuántos no, distinguidos por tipo (verdaderos positivos, falsos positivos, verdaderos negativos, falsos negativos).
+        </p>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          <strong>Métricas clave:</strong> Precisión, sensibilidad (recall), especificidad, F1-score. En medicina, la sensibilidad (detectar todos los positivos) y la especificidad (no etiquetar falsos positivos) son especialmente relevantes.
+        </p>
+
+        <!-- Resultados del modelo -->
+        <div class="mt-8 p-6 bg-brand-50 rounded-xl border border-brand-200">
+          <h4 class="text-lg font-bold text-brand-900 mb-4">Resultados obtenidos en el conjunto de test</h4>
+          <p class="text-slate-700 mb-4">Con 88 imágenes de prueba (44 COVID-19, 44 Normal), el modelo alcanzó:</p>
+          <div class="overflow-x-auto mb-6">
+            <table class="min-w-full border border-slate-300 rounded-lg overflow-hidden">
+              <thead class="bg-slate-100">
+                <tr>
+                  <th class="px-4 py-2 text-left text-slate-800 font-semibold">Clase</th>
+                  <th class="px-4 py-2 text-center text-slate-800 font-semibold">Precisión</th>
+                  <th class="px-4 py-2 text-center text-slate-800 font-semibold">Sensibilidad (Recall)</th>
+                  <th class="px-4 py-2 text-center text-slate-800 font-semibold">F1-score</th>
+                  <th class="px-4 py-2 text-center text-slate-800 font-semibold">Support</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white">
+                <tr>
+                  <td class="px-4 py-2 border-t border-slate-200">COVID-19</td>
+                  <td class="px-4 py-2 border-t border-slate-200 text-center">98%</td>
+                  <td class="px-4 py-2 border-t border-slate-200 text-center">98%</td>
+                  <td class="px-4 py-2 border-t border-slate-200 text-center">98%</td>
+                  <td class="px-4 py-2 border-t border-slate-200 text-center">44</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2 border-t border-slate-200">Normal</td>
+                  <td class="px-4 py-2 border-t border-slate-200 text-center">98%</td>
+                  <td class="px-4 py-2 border-t border-slate-200 text-center">98%</td>
+                  <td class="px-4 py-2 border-t border-slate-200 text-center">98%</td>
+                  <td class="px-4 py-2 border-t border-slate-200 text-center">44</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-slate-700 mb-4"><strong>Accuracy global:</strong> 98%</p>
+          <div class="mb-4">
+            <p class="text-slate-700 font-semibold mb-2">Matriz de confusión:</p>
+            <div class="inline-block border-2 border-slate-300 rounded-lg overflow-hidden">
+              <table class="text-sm">
+                <tr>
+                  <td class="px-4 py-2 bg-slate-100 font-semibold border-b border-r border-slate-300"></td>
+                  <td class="px-4 py-2 bg-slate-100 font-semibold border-b border-slate-300 text-center">Predicho: COVID</td>
+                  <td class="px-4 py-2 bg-slate-100 font-semibold border-b border-slate-300 text-center">Predicho: Normal</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2 bg-slate-100 font-semibold border-r border-slate-300">Real: COVID</td>
+                  <td class="px-4 py-2 bg-green-100 text-center font-semibold">43 (VP)</td>
+                  <td class="px-4 py-2 bg-red-100 text-center font-semibold">1 (FN)</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2 bg-slate-100 font-semibold border-r border-b border-slate-300">Real: Normal</td>
+                  <td class="px-4 py-2 bg-red-100 text-center font-semibold border-b border-slate-300">1 (FP)</td>
+                  <td class="px-4 py-2 bg-green-100 text-center font-semibold border-b border-slate-300">43 (VN)</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <p class="text-slate-700 text-sm">
+            <strong>Interpretación:</strong> VP = Verdaderos positivos, VN = Verdaderos negativos, FP = Falsos positivos, FN = Falsos negativos. De 44 casos reales de COVID-19, el modelo identificó correctamente 43 (1 falso negativo). De 44 casos normales, identificó correctamente 43 (1 falso positivo).
+          </p>
+        </div>
+        <div class="mt-8">
+          <h4 class="text-lg font-bold text-brand-900 mb-4">Curva ROC</h4>
+          <p class="text-slate-700 mb-4 leading-relaxed">
+            La <strong>curva ROC</strong> (Receiver Operating Characteristic) muestra la capacidad del modelo para discriminar entre clases a distintos umbrales de decisión. El área bajo la curva (AUC) resume el rendimiento: 1.0 = clasificación perfecta; 0.5 = aleatorio. Un AUC cercano a 1 indica que el modelo separa bien COVID-19 de Normal.
+          </p>
+          <img src="assets/images/Curva%20ROC.png" alt="Curva ROC del modelo de detección de COVID-19" class="w-full max-w-2xl mx-auto rounded-xl shadow-lg border border-slate-200">
+        </div>
+      </article>
+
+      <!-- RESUMEN Y LIMITACIONES -->
+      <article class="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+        <h3 class="text-2xl font-bold text-brand-800 mb-6">Resumen y limitaciones</h3>
+        <p class="text-slate-700 mb-4 leading-relaxed">
+          El flujo completo es: <strong>datos → exploración → preprocesamiento → modelo CNN → entrenamiento → evaluación</strong>. Cada paso influye en el resultado final.
+        </p>
+        <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-4">
+          <p class="text-amber-800 font-semibold">Limitaciones importantes:</p>
+          <ul class="text-slate-700 mt-2 space-y-1 list-disc list-inside">
+            <li>Dataset pequeño (cientos de imágenes). En práctica clínica se requieren muchos más datos.</li>
+            <li>Clasificación binaria simplificada. En realidad hay neumonías de otras causas, tuberculosis, etc.</li>
+            <li>La radiografía por sí sola no diagnostica COVID-19; el contexto clínico y pruebas de laboratorio son esenciales.</li>
+            <li>Un modelo entrenado con datos de un centro puede no generalizar bien a otros centros o equipos.</li>
+          </ul>
+        </div>
+        <p class="text-slate-700 leading-relaxed">
+          Este taller sirve para entender el <strong>proceso</strong> y los conceptos, no para su uso clínico directo. El criterio médico y la validación regulatoria siguen siendo imprescindibles.
+        </p>
+      </article>
+    </div>
+
+    <div class="mt-14 text-center">
+      <a [href]="colabUrl"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="inline-flex items-center gap-3 px-8 py-4 bg-brand text-white font-semibold rounded-xl hover:bg-brand-600 transition-colors shadow-lg">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        Abrir el taller en Google Colab
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
