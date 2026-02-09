@@ -1,0 +1,22 @@
+<section id="conclusion" class="py-20 px-6 bg-gradient-to-br from-brand-900 via-brand-800 to-brand-700 text-white">
+  <div class="max-w-3xl mx-auto text-center">
+    <h2 class="text-3xl md:text-4xl font-bold mb-10">Cierre</h2>
+    <p class="text-xl text-brand-100 mb-10">Takeaways claros:</p>
+    <ul class="space-y-4 mb-14 text-left">
+      @for (takeaway of content.takeaways; track takeaway) {
+        <li class="flex items-center gap-3 text-lg">
+          <svg class="w-6 h-6 text-brand-200 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          {{ takeaway }}
+        </li>
+      }
+    </ul>
+    <a [href]="content.ctaHref" class="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-900 font-semibold rounded-xl hover:bg-brand-50 transition-colors shadow-lg">
+      {{ content.ctaText }}
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+    </a>
+  </div>
+</section>

@@ -1,0 +1,28 @@
+<section class="relative">
+  <div class="w-full overflow-hidden">
+    <img src="assets/images/COLOR-COMPARTIDO2.png" alt="Banner - Introducción a la IA en Medicina" class="w-full h-auto object-cover object-center max-h-[50vh]">
+  </div>
+  <div class="bg-white py-16 px-6">
+    <div class="max-w-4xl mx-auto text-center">
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight text-brand-900">
+        {{ hero.title }}
+      </h1>
+      <p class="text-xl md:text-2xl text-brand-800 mb-10 max-w-2xl mx-auto">
+        {{ hero.subtitle }}
+      </p>
+      <div class="flex flex-wrap justify-center gap-3 mb-12">
+        @for (badge of hero.badges; track badge) {
+          <span class="px-4 py-2 rounded-full bg-brand-50 border border-brand-200 text-brand-800 text-sm font-medium">
+            {{ badge }}
+          </span>
+        }
+      </div>
+      <a [href]="hero.ctaTarget" class="inline-flex items-center gap-2 px-8 py-4 bg-brand text-white font-semibold rounded-xl hover:bg-brand-600 transition-colors shadow-lg">
+        {{ hero.ctaText }}
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7 7m7 7V3" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>

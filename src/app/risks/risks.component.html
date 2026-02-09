@@ -1,0 +1,26 @@
+<section id="risks" class="py-20 px-6 bg-white">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Riesgos y responsabilidad clínica</h2>
+    <p class="text-lg text-slate-600 mb-14">Entender los riesgos es parte de usar IA con criterio.</p>
+
+    <ul class="space-y-6 mb-12">
+      @for (risk of risks; track risk.title) {
+        <li class="flex gap-4 p-6 bg-slate-50 rounded-xl border border-slate-200">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 mb-2">{{ risk.title }}</h3>
+            <p class="text-slate-700">{{ risk.description }}</p>
+          </div>
+        </li>
+      }
+    </ul>
+
+    <div class="bg-red-100 border-2 border-red-400 p-8 rounded-xl text-center">
+      <p class="text-xl font-bold text-red-900">La IA no tiene licencia médica. El médico sí.</p>
+    </div>
+  </div>
+</section>

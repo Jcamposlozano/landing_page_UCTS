@@ -1,0 +1,20 @@
+<section id="ai-map" class="py-20 px-6 bg-white">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">El mapa general de la IA</h2>
+    <p class="text-lg text-slate-600 mb-14 max-w-2xl">
+      "IA" es una sombrilla que incluye muchas tecnologías. Aquí tienes el panorama completo:
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      @for (item of items; track item.id) {
+        <article class="bg-slate-50 rounded-xl p-6 border border-slate-200 hover:border-brand-300 hover:shadow-md transition-all">
+          <h3 class="text-lg font-bold text-brand-800 mb-3">{{ item.title }}</h3>
+          <p class="text-slate-700 text-sm mb-4">{{ item.description }}</p>
+          <div class="space-y-2 text-sm">
+            <p><span class="font-semibold text-slate-800">Qué hace:</span> {{ item.whatItDoes }}</p>
+            <p><span class="font-semibold text-slate-800">Ejemplo:</span> {{ item.example }}</p>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>

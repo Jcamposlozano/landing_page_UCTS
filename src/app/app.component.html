@@ -1,0 +1,38 @@
+<div class="min-h-screen bg-white">
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm" aria-label="Navegación principal">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+        <a href="#" class="flex items-center gap-2">
+          <img src="assets/images/COLOR.png" alt="Logo" class="h-10 w-auto">
+          <span class="font-bold text-brand-900 hidden sm:inline">IA en Medicina</span>
+        </a>
+        <div class="flex items-center gap-2 overflow-x-auto py-2">
+          @for (link of navLinks; track link.href) {
+            <a [href]="link.href"
+               class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-brand-800 hover:bg-brand-50 rounded-lg whitespace-nowrap transition-colors">
+              {{ link.label }}
+            </a>
+          }
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-16">
+    <app-hero />
+    <app-what-is-ai />
+    <app-ai-map />
+    <app-ml-vs-dl />
+    <app-generative-ai />
+    <app-agents-rag-flows />
+    <app-medical-use-cases />
+    <app-myths />
+    <app-risks />
+    <app-conclusion />
+    <app-workshop />
+  </main>
+
+  <footer class="py-8 px-6 bg-brand-900 text-brand-200 text-center text-sm">
+    <p>Introducción a la IA en Medicina — Curso conceptual para estudiantes de medicina</p>
+  </footer>
+</div>
